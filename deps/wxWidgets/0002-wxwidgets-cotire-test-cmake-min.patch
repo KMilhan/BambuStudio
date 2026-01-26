@@ -1,0 +1,16 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Codex <codex@local>
+Date: Sun, 25 Jan 2026 12:00:00 +0000
+Subject: [PATCH] Bump cotire test CMake minimum for CMake 4
+
+--- a/build/cmake/modules/cotire_test/CMakeLists.txt
++++ b/build/cmake/modules/cotire_test/CMakeLists.txt
+@@ -1,7 +1,7 @@
+ # cotire example project
+ 
+-cmake_minimum_required(VERSION 2.8.12)
++cmake_minimum_required(VERSION 3.5)
+ 
+ if (POLICY CMP0058)
+ 	# Ninja requires custom command byproducts to be explicit
+ 	cmake_policy(SET CMP0058 NEW)

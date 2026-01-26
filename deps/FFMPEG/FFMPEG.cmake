@@ -51,6 +51,12 @@ else ()
         set(_build_j "-j$ENV{CMAKE_BUILD_PARALLEL_LEVEL}")
     endif()
 
+    find_program(NASM_EXECUTABLE nasm)
+    find_program(YASM_EXECUTABLE yasm)
+    if (NOT NASM_EXECUTABLE AND NOT YASM_EXECUTABLE)
+        set(_x86asm_cmd --disable-x86asm)
+    endif()
+
     ExternalProject_Add(dep_FFMPEG
         URL https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n7.0.2.tar.gz
         URL_HASH SHA256=5EB46D18D664A0CCADF7B0ADEE03BD3B7FA72893D667F36C69E202A807E6D533
@@ -60,6 +66,7 @@ else ()
             ${_pic_cmd}
             ${_arch_cmd}
             ${_cc_cmd}
+            ${_x86asm_cmd}
             --prefix="${DESTDIR}/usr/local"
             --enable-shared
             --disable-doc

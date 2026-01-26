@@ -18,7 +18,15 @@ if (MSVC)
 
 else ()
     set(_gmp_ccflags "-O2 -DNDEBUG -fPIC -DPIC -Wall -Wmissing-prototypes -Wpointer-arith -pedantic -fomit-frame-pointer -fno-common")
+    set(_gmp_cflags "${_gmp_ccflags} -std=gnu89")
     set(_gmp_build_tgt "${CMAKE_SYSTEM_PROCESSOR}")
+    set(_gmp_env_args "")
+
+    find_program(CLANG_EXECUTABLE clang)
+    find_program(CLANGXX_EXECUTABLE clang++)
+    if (CLANG_EXECUTABLE AND CLANGXX_EXECUTABLE)
+        list(APPEND _gmp_env_args "CC=${CLANG_EXECUTABLE}" "CXX=${CLANGXX_EXECUTABLE}")
+    endif()
 
     if (APPLE)
         if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
@@ -61,7 +69,7 @@ else ()
         URL_HASH SHA256=705ae57ee2014b2c6fc0f572c85ee43276b99b6b256ee16c1a9d3a8c4e3609d5
         DOWNLOAD_DIR ${DEP_DOWNLOAD_DIR}/GMP
         BUILD_IN_SOURCE ON 
-        CONFIGURE_COMMAND  env "CFLAGS=${_gmp_ccflags}" "CXXFLAGS=${_gmp_ccflags}" ./configure ${_cross_compile_arg} --enable-shared=no --enable-cxx=yes --enable-static=yes "--prefix=${DESTDIR}/usr/local" ${_gmp_build_tgt}
+        CONFIGURE_COMMAND  env ${_gmp_env_args} "CFLAGS=${_gmp_cflags}" "CXXFLAGS=${_gmp_ccflags}" ./configure ${_cross_compile_arg} --enable-shared=no --enable-cxx=yes --enable-static=yes "--prefix=${DESTDIR}/usr/local" ${_gmp_build_tgt}
         BUILD_COMMAND     make -j
         INSTALL_COMMAND   make install
     )
