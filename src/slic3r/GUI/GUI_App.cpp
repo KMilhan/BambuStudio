@@ -1437,7 +1437,16 @@ GUI_App::GUI_App()
 	//app config initializes early becasuse it is used in instance checking in BambuStudio.cpp
     this->init_app_config();
     if (app_config) {
-        ::Label::initSysFont(app_config->get_language_code(), false);
+        std::string lang_code = app_config->get_language_code();
+#ifdef __linux__
+        if (lang_code == "ko") {
+            // Workaround: Korean font init can crash GTK on some Linux setups.
+            // Use default font setup while keeping translations Korean.
+            BOOST_LOG_TRIVIAL(warning) << "Korean UI language may crash GTK on some Linux setups; using default font init.";
+            lang_code.clear();
+        }
+#endif
+        ::Label::initSysFont(lang_code, false);
     }
     this->init_download_path();
 
@@ -6249,10 +6258,22 @@ bool GUI_App::load_language(wxString language, bool initial)
     // Alternate language code.
     wxLanguage language_dict = wxLanguage(language_info->Language);
     if (language_info->CanonicalName.BeforeFirst('_') == "sk") {
-    	// Slovaks understand Czech well. Give them the Czech translation.
-    	language_dict = wxLANGUAGE_CZECH;
+	    // Slovaks understand Czech well. Give them the Czech translation.
+	    language_dict = wxLANGUAGE_CZECH;
 		BOOST_LOG_TRIVIAL(info) << "Using Czech dictionaries for Slovak language";
     }
+
+#ifdef __linux__
+    if (language_info->CanonicalName.BeforeFirst('_') == "ko") {
+        // Workaround: Korean locale can crash GTK on some Linux setups.
+        // Keep Korean translations, but use en_US for locale initialization.
+        const wxLanguageInfo *en_info = wxLocale::GetLanguageInfo(wxLANGUAGE_ENGLISH_US);
+        if (en_info != nullptr) {
+            BOOST_LOG_TRIVIAL(warning) << "Korean locale can crash GTK on some Linux setups; using en_US locale with Korean translations.";
+            language_info = en_info;
+        }
+    }
+#endif
 
 #ifdef __linux__
     // If we can't find this locale , try to use different one for the language
