@@ -691,7 +691,13 @@ elseif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     FIND_LIBRARY(WAYLAND_EGL_LIBRARIES    NAMES wayland-egl)
     FIND_LIBRARY(WAYLAND_CLIENT_LIBRARIES NAMES wayland-client)
     find_package(CURL REQUIRED)
-    target_link_libraries(libslic3r_gui ${DBUS_LIBRARIES} OSMesa)
+    find_library(OSMESA_LIBRARY NAMES OSMesa)
+    if (OSMESA_LIBRARY)
+        target_link_libraries(libslic3r_gui ${DBUS_LIBRARIES} ${OSMESA_LIBRARY})
+    else()
+        target_link_libraries(libslic3r_gui ${DBUS_LIBRARIES})
+        message(WARNING "OSMesa not found; building without it")
+    endif()
     target_link_libraries(libslic3r_gui
         OpenGL::EGL
         ${WAYLAND_SERVER_LIBRARIES}
