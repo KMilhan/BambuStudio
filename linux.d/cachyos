@@ -1,0 +1,52 @@
+# Minimal CachyOS/Arch support for BuildLinux.sh
+# Only checks for GTK3 dev via pkg-config and offers an optional pacman install list.
+
+FOUND_GTK3=$(pkg-config --exists gtk+-3.0 && echo gtk3 || true)
+
+REQUIRED_DEV_PACKAGES=(
+  autoconf
+  automake
+  base-devel
+  cmake
+  dbus
+  eglexternalplatform
+  extra-cmake-modules
+  file
+  gettext
+  git
+  gstreamer
+  gst-plugins-base
+  gst-plugins-good
+  gtk3
+  libmspack
+  libsecret
+  libtool
+  m4
+  mesa
+  mesa-libgl
+  mesa-utils
+  ninja
+  openssl
+  perl
+  texinfo
+  wayland
+  wayland-protocols
+  libxkbcommon
+  wget
+  curl
+  nasm
+  yasm
+  x264
+  bzip2
+  webkit2gtk-4.1
+)
+
+if [[ -n "$UPDATE_LIB" ]]
+then
+  # Install build deps on Arch-based systems.
+  sudo pacman -Syu --needed ${REQUIRED_DEV_PACKAGES[@]}
+  echo -e "done\n"
+  exit 0
+fi
+
+FOUND_GTK3_DEV=$(pkg-config --exists gtk+-3.0 && echo gtk3 || true)
