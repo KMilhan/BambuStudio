@@ -758,16 +758,7 @@ void MediaPlayCtrl::SetStatus(wxString const &msg2, bool hyperlink)
         int state2 = m_last_state >= MEDIASTATE_IDLE ? m_last_state - MEDIASTATE_IDLE :
                                                        m_last_state + MEDIASTATE_BUFFERING - MEDIASTATE_IDLE;
         msg += wxString::Format(" [%d:%d]", state2, m_failed_code);
-
-        time_t now = time(nullptr);
-        std::tm *local_tm = std::localtime(&now);
-        bool use_12h_format = wxGetApp().app_config->get("use_12h_time_format") == "true";
-        std::string time_str = Slic3r::format_time_hm(local_tm, use_12h_format);
-
-        msg += wxString::Format(_T(" <%02d-%02d %s>"),
-                               local_tm->tm_mon + 1,
-                               local_tm->tm_mday,
-                               time_str);
+        msg += wxDateTime::Now().Format(_T(" <%m-%d %H:%M>"));
     }
     BOOST_LOG_TRIVIAL(info) << "MediaPlayCtrl::SetStatus: " << msg.ToUTF8().data() << " tutk_state: " << m_tutk_state;
 #ifdef __WXMSW__
@@ -910,7 +901,7 @@ bool MediaPlayCtrl::start_stream_service(bool *need_install)
         boost::filesystem::path start_dir(boost::filesystem::path(data_dir()) / "plugins");
 #ifdef __WXMSW__
         auto plugins_dir = boost::nowide::widen(data_dir()) + L"\\plugins\\";
-        for (auto dll : {L"BambuSource.dll", L"live555.dll", L"agora_rtc_sdk.dll", L"libagora-core.dll", L"libagora-ffmpeg.dll", L"libagora-soundtouch.dll"}) {
+        for (auto dll : {L"BambuSource.dll", L"live555.dll", L"agora_rtc_sdk.dll", L"libaosl.dll", L"libagora-ffmpeg.dll", L"libagora-soundtouch.dll"}) {
             auto file_dll  = tools_dir + dll;
             auto file_dll2 = plugins_dir + dll;
             if (!boost::filesystem::exists(file_dll) || boost::filesystem::last_write_time(file_dll) != boost::filesystem::last_write_time(file_dll2))
